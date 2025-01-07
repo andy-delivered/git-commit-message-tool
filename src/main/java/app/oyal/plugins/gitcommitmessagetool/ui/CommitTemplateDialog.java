@@ -11,8 +11,10 @@ import javax.swing.*;
 import java.awt.*;
 
 public class CommitTemplateDialog extends DialogWrapper {
+    private ComboBox<String> jiraKeyComboBox;
+
+    private JBTextField jiraNumberField;
     private ComboBox<String> typeComboBox;
-    private JBTextField scopeField;
     private JBTextField shortDescriptionField;
     private JBTextArea detailedDescriptionArea;
     private JBTextArea breakingChangeCheckBox;
@@ -39,9 +41,11 @@ public class CommitTemplateDialog extends DialogWrapper {
         gbc.weightx = 0.2;
         gbc.gridx = 0;
         gbc.gridy = 0;
-        formPanel.add(new JLabel("Change Type"), gbc);
+        formPanel.add(new JLabel("Jira Key"), gbc);
         gbc.gridy++;
-        formPanel.add(new JLabel("Scope"), gbc);
+        formPanel.add(new JLabel("Jira Number"), gbc);
+        gbc.gridy++;
+        formPanel.add(new JLabel("Change Type"), gbc);
         gbc.gridy++;
         formPanel.add(new JLabel("Short Description"), gbc);
         gbc.gridy++;
@@ -56,23 +60,28 @@ public class CommitTemplateDialog extends DialogWrapper {
         gbc.weightx = 0.8;
         gbc.gridx = 1;
         gbc.gridy = 0;
+
+        jiraKeyComboBox = new ComboBox<>(new String[]{"XBD", "GCD", "DBTS"});
+        formPanel.add(jiraKeyComboBox, gbc);
+        gbc.gridy++;
+        jiraNumberField = new JBTextField();
+        formPanel.add(jiraNumberField, gbc);
+        gbc.gridy++;
+
         typeComboBox = new ComboBox<>(new String[]{
-                "feat - A new feature",
-                "fix - A bug fix",
-                "docs - Documentation only changes",
-                "style - Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)",
-                "refactor - A code change that neither fixes a bug nor adds a feature",
-                "perf - A code change that improves performance",
-                "test - Adding missing tests or correcting existing tests",
-                "build - Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)",
-                "ci - Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)",
-                "chore - Other changes that don't modify src or test files",
-                "revert - Reverts a previous commit"
+                "feature - 새로운 기능을 개발했을때 사용합니다.",
+                "fix - 버그를 수정했을때 사용합니다.",
+                "docs - 코드에 영향을 주지 않는 문서 관련 변경 사항에 사용합니다. 예) docs: README 파일수정",
+                "style - 스타일을 변경할때 사용합니다. 기능변화가 없어야합니다. (white-space, formatting, missing semi-colons, etc)",
+                "refactor - 코드 리팩토링했을때 사용합니다.",
+                "perf - 코드 성능을 향상시키는 코드로 변경했을때 사용합니다",
+                "test - 테스트 코드 추가했을떄 혹은 기존 테스트 코드 수정했을때 사용합니다.",
+                "build - 빌드 관련 코드 수정했을때 사용합니다 (npm, gradle, maven)",
+                "ci - ci 관련 구성파일을 수정했을때 사용합니다 (jenkins github action등)",
+                "chore - 기타 변경사항 적용 , 코드나 기능에 큰영향을 미치지않는 업무(빌드 작업변경 패키지업데이트)",
+                "revert - 커밋을 이전으로 되돌렸을때 사용합니다"
         });
         formPanel.add(typeComboBox, gbc);
-        gbc.gridy++;
-        scopeField = new JBTextField();
-        formPanel.add(scopeField, gbc);
         gbc.gridy++;
         shortDescriptionField = new JBTextField();
         formPanel.add(shortDescriptionField, gbc);
@@ -94,6 +103,27 @@ public class CommitTemplateDialog extends DialogWrapper {
         return dialogPanel;
     }
 
+    public String getJiraKeyComboBox() {
+        return (String) jiraKeyComboBox.getSelectedItem();
+    }
+
+    public void setJiraKeyComboBox(String jiraKey) {
+        for (int i = 0; i < typeComboBox.getItemCount(); i++) {
+            if (typeComboBox.getItemAt(i).startsWith(jiraKey)) {
+                typeComboBox.setSelectedIndex(i);
+                break;
+            }
+        }
+    }
+
+    public String getJiraNumberField() {
+        return jiraNumberField.getText();
+    }
+
+    public void setJiraNumberField(String jiraNumber) {
+        jiraNumberField.setText(jiraNumber);
+    }
+
     public String getType() {
         return (String) typeComboBox.getSelectedItem();
     }
@@ -107,13 +137,7 @@ public class CommitTemplateDialog extends DialogWrapper {
         }
     }
 
-    public String getScope() {
-        return scopeField.getText();
-    }
 
-    public void setScope(String scope) {
-        scopeField.setText(scope);
-    }
 
     public String getShortDescription() {
         return shortDescriptionField.getText();
